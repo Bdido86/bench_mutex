@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"golang.org/x/sync/errgroup"
 	"sync"
 	"sync/atomic"
 )
@@ -10,6 +11,9 @@ var (
 	mutexCounter int32
 	mx           sync.Mutex
 	wgMutex      sync.WaitGroup
+
+	mutexErrorCounter int32
+	mxError           sync.Mutex
 
 	channelCounter int32
 	ch             chan struct{}
@@ -27,6 +31,12 @@ func incMutexCounter() {
 	mx.Unlock()
 }
 
+func incMutexErrorCounter() {
+	mxError.Lock()
+	mutexErrorCounter++
+	mxError.Unlock()
+}
+
 func incChannelCounter() {
 	ch <- struct{}{}
 	channelCounter++
@@ -42,6 +52,12 @@ func main() {
 	runMutexExample()
 	fmt.Println(mutexCounter)
 	fmt.Println("runMutexExample end")
+	fmt.Println("")
+
+	fmt.Println("runMutexErrorExample start")
+	runMutexErrorExample()
+	fmt.Println(mutexErrorCounter)
+	fmt.Println("runMutexErrorExample end")
 	fmt.Println("")
 
 	fmt.Println("runChannelExample start")
@@ -68,6 +84,19 @@ func runMutexExample() {
 		}()
 	}
 	wgMutex.Wait()
+}
+
+func runMutexErrorExample() {
+	mxError = sync.Mutex{}
+	g := new(errgroup.Group)
+
+	for i := 0; i < counter; i++ {
+		g.Go(func() error {
+			incMutexErrorCounter()
+			return nil
+		})
+	}
+	g.Wait()
 }
 
 func runChannelExample() {

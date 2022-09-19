@@ -3,9 +3,9 @@ package main
 
 import "testing"
 
-func BenchmarkRunChannelExample(b *testing.B) {
+func BenchmarkRunAtomicExample(b *testing.B) {
 	for i := 0; i <= b.N; i++ {
-		runChannelExample()
+		runAtomicExample()
 	}
 }
 
@@ -15,8 +15,14 @@ func BenchmarkRunMutexExample(b *testing.B) {
 	}
 }
 
-func BenchmarkRunAtomicExample(b *testing.B) {
+func BenchmarkRunMutexErrorExample(b *testing.B) {
 	for i := 0; i <= b.N; i++ {
-		runAtomicExample()
+		runMutexErrorExample()
+	}
+}
+
+func BenchmarkRunChannelExample(b *testing.B) {
+	for i := 0; i <= b.N; i++ {
+		runChannelExample()
 	}
 }
